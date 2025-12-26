@@ -3,11 +3,18 @@
  */
 import React from 'react'
 
-function Layout({ children, header }) {
+function Layout({ children, header, nav }) {
   return (
     <div className="layout">
       <header className="layout-header">
-        {header || <h1>AI Memory Hub</h1>}
+        <div className="header-container">
+          <div className="header-left">
+            {header || <h1>AI Memory Hub</h1>}
+          </div>
+          <nav className="header-nav">
+            {nav}
+          </nav>
+        </div>
       </header>
       <main className="layout-main">
         {children}

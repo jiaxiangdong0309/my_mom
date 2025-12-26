@@ -9,23 +9,46 @@ import MemoryDetail from './components/MemoryDetail'
 import SearchBar from './components/SearchBar'
 import SearchResults from './components/SearchResults'
 import SuggestionCard from './components/SuggestionCard'
+import UserProfile from './components/UserProfile'
 import { createMemory, deleteMemory, searchMemories, searchMemoriesSQLite, getAllMemories, getStats } from './api'
 import { generateRandomSuggestions } from './utils/randomSuggestions'
 
 function App() {
   // 页面状态：'list' | 'create' | 'detail' | 'search'
   const [currentPage, setCurrentPage] = useState('list')
+  /** @type {[any[], Function]} */
   const [memories, setMemories] = useState([])
+  /** @type {[any[], Function]} */
   const [searchResults, setSearchResults] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedMemoryId, setSelectedMemoryId] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+  /** @type {[any[], Function]} */
   const [suggestions, setSuggestions] = useState([])
   const [suggestionsExpanded, setSuggestionsExpanded] = useState(false)
   const [searchMode, setSearchMode] = useState('vector') // 'vector' | 'sqlite'
   const [stats, setStats] = useState({ sqlite_count: 0, chroma_count: 0 })
+
+  // 统计标签使用情况
+  const tagStats = React.useMemo(() => {
+    const tagCount = {}
+    memories.forEach(memory => {
+      if (memory.tags && Array.isArray(memory.tags)) {
+        // 每个记忆中的标签去重后统计
+        const uniqueTags = [...new Set(memory.tags)]
+        uniqueTags.forEach(tag => {
+          if (tag) {
+            tagCount[tag] = (tagCount[tag] || 0) + 1
+          }
+        })
+      }
+    })
+    return Object.entries(tagCount)
+      .map(([tag, count]) => ({ name: tag, value: count }))
+      .sort((a, b) => b.value - a.value)
+  }, [memories])
 
   // 生成随机建议 - 每次进入页面时生成
   useEffect(() => {
@@ -53,7 +76,7 @@ function App() {
   // 加载所有记忆
   useEffect(() => {
     const loadMemories = async () => {
-      if (currentPage === 'list' && memories.length === 0 && !loading) {
+      if ((currentPage === 'list' || currentPage === 'profile') && memories.length === 0 && !loading) {
         setLoading(true)
         setError(null)
         try {
@@ -68,7 +91,7 @@ function App() {
     }
     loadMemories()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger])
+  }, [refreshTrigger, currentPage])
 
   // 执行搜索
   const handleSearch = async (query, mode = searchMode) => {
@@ -202,29 +225,46 @@ function App() {
     switch (currentPage) {
       case 'create':
         return (
-          <>
+          <div className="page-container fadeIn">
+            <div className="page-header">
+              <h2>✨ 创建新记忆</h2>
+              <button className="btn-secondary" onClick={handleBack}>返回列表</button>
+            </div>
             {renderSuggestions()}
             <MemoryForm
               onSubmit={handleCreateMemory}
               onCancel={handleBack}
             />
-          </>
+          </div>
         )
       case 'detail':
         return (
-          <>
-            {renderSuggestions()}
+          <div className="page-container fadeIn">
             <MemoryDetail
               memoryId={selectedMemoryId}
               onBack={handleBack}
               onDelete={handleDeleteMemory}
             />
-          </>
+          </div>
         )
       case 'search':
         return (
-          <>
-            {renderSuggestions()}
+          <div className="page-container fadeIn">
+            <div className="page-header">
+              <h2>🔍 搜索记忆</h2>
+              <div className="app-stats">
+                <span>SQLite 数据 {stats.sqlite_count} 条</span>
+                <span>向量数据库 {stats.chroma_count} 条</span>
+              </div>
+            </div>
+            <div className="search-section">
+              <SearchBar
+                onSearch={handleSearch}
+                loading={loading}
+                searchMode={searchMode}
+                onModeChange={handleModeChange}
+              />
+            </div>
             <SearchResults
               results={searchResults}
               query={searchQuery}
@@ -232,12 +272,32 @@ function App() {
               onMemoryClick={handleMemoryClick}
               onMemoryDelete={handleDeleteMemory}
             />
-          </>
+          </div>
+        )
+      case 'profile':
+        return (
+          <div className="page-container fadeIn">
+            <UserProfile
+              tagStats={tagStats}
+              totalMemories={stats.sqlite_count}
+              onBack={handleBack}
+              loading={loading}
+            />
+          </div>
         )
       case 'list':
       default:
         return (
-          <>
+          <div className="page-container fadeIn">
+            <div className="page-header">
+              <h2>📚 全部记忆</h2>
+              <button
+                className="btn-primary"
+                onClick={() => setCurrentPage('create')}
+              >
+                + 创建记忆
+              </button>
+            </div>
             {renderSuggestions()}
             <MemoryList
               memories={memories}
@@ -245,41 +305,48 @@ function App() {
               onMemoryDelete={handleDeleteMemory}
               refreshTrigger={refreshTrigger}
             />
-          </>
+          </div>
         )
     }
   }
 
+  const renderNav = () => (
+    <>
+      <div
+        className={`nav-item ${(currentPage === 'list' || currentPage === 'detail' || currentPage === 'create') ? 'active' : ''}`}
+        onClick={() => {
+          setCurrentPage('list')
+          setSearchQuery('')
+        }}
+      >
+        🏠 首页
+      </div>
+      <div
+        className={`nav-item ${currentPage === 'search' ? 'active' : ''}`}
+        onClick={() => setCurrentPage('search')}
+      >
+        🔍 搜索
+      </div>
+      <div
+        className={`nav-item ${currentPage === 'profile' ? 'active' : ''}`}
+        onClick={() => setCurrentPage('profile')}
+      >
+        👤 用户画像
+      </div>
+    </>
+  )
+
   return (
-    <Layout>
+    <Layout
+      header={<h1 onClick={() => {setCurrentPage('list'); setSearchQuery('')}} style={{ cursor: 'pointer' }}>AI Memory Hub</h1>}
+      nav={renderNav()}
+    >
       <div className="app-container">
         {error && (
           <div className="app-error" onClick={() => setError(null)}>
             {error} (点击关闭)
           </div>
         )}
-
-        <div className="app-header-actions">
-          <SearchBar
-            onSearch={handleSearch}
-            loading={loading}
-            searchMode={searchMode}
-            onModeChange={handleModeChange}
-          />
-          {currentPage !== 'create' && (
-            <button
-              className="btn-primary"
-              onClick={() => setCurrentPage('create')}
-            >
-              + 创建记忆
-            </button>
-          )}
-        </div>
-
-        <div className="app-stats">
-          <span>SQLite 数据 {stats.sqlite_count} 条</span>
-          <span>向量数据库 {stats.chroma_count} 条</span>
-        </div>
 
         {renderPage()}
       </div>
