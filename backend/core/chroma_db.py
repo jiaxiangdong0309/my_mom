@@ -6,7 +6,7 @@ from chromadb.config import Settings
 from typing import List, Dict, Optional
 import numpy as np
 import os
-from config import settings
+from ..config import settings
 
 class ChromaDB:
     """ChromaDB 简单封装"""

@@ -2,11 +2,11 @@
 存储接口路由
 """
 from fastapi import APIRouter, HTTPException
-from api.models import MemoryCreate, MemoryResponse
-from core.chroma_db import ChromaDB
-from core.sqlite_db import SQLiteDB
-from core.embedding import Embedding
-from utils.text_splitter import split_text_by_chars
+from .models import MemoryCreate, MemoryResponse
+from ..core.chroma_db import ChromaDB
+from ..core.sqlite_db import SQLiteDB
+from ..core.embedding import Embedding
+from ..utils.text_splitter import split_text_by_chars
 import numpy as np
 
 router = APIRouter(prefix="/api/v1/memories", tags=["memories"])

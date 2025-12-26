@@ -6,7 +6,7 @@ import json
 import os
 from typing import List, Optional, Dict
 from datetime import datetime
-from config import settings
+from ..config import settings
 
 class SQLiteDB:
     """SQLite 简单封装"""

@@ -9,7 +9,7 @@ os.environ["HF_ENDPOINT"] = "https://modelscope.cn/api/v1/models/server/huggingf
 
 from sentence_transformers import SentenceTransformer
 import numpy as np
-from config import settings
+from ..config import settings
 
 class Embedding:
     """Embedding 简单封装"""

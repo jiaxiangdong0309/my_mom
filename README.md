@@ -12,6 +12,9 @@ AI 知识记忆库是一个本地部署的知识管理系统，采用 **SQLite +
 - 🏷️ **标签管理**：多标签分类与过滤
 - 🌐 **Web UI**：可视化记忆管理与搜索界面
 - 💡 **快速创建**：随机建议辅助快速录入
+- 📊 **用户画像**：标签统计可视化（云图、饼图、柱状图）
+- 🚀 **CLI 工具**：命令行界面，支持后台运行
+- 📦 **打包安装**：支持 pip 安装，一键部署
 
 ## 项目架构
 
@@ -67,6 +70,8 @@ graph TB
 - React + TypeScript 构建的现代化 Web 界面
 - 提供记忆创建、编辑、删除、搜索等完整功能
 - 支持语义搜索和全文检索两种模式切换
+- 用户画像可视化（标签云图、饼图、柱状图）
+- 前端构建产物集成到后端，支持单端口访问
 
 #### 2. 服务层（中层）
 
@@ -160,6 +165,7 @@ sequenceDiagram
 - **框架**: React 18 + TypeScript 5
 - **构建工具**: Vite 5
 - **样式**: 原生 CSS（无 UI 框架）
+- **可视化**: @visactor/vchart（标签统计图表）
 
 ## 项目结构
 
@@ -200,11 +206,17 @@ Mymom/
 │   └── vite.config.js
 ├── scripts/                    # 工具脚本
 │   ├── run_dev.py              # 一键启动开发服务器
+│   ├── build_dist.py           # 构建前端并集成到后端
+│   ├── build_package.py        # 一键打包脚本
 │   ├── store_data.py           # 数据存储测试
 │   ├── search_sqlite.py        # SQLite 搜索测试
 │   └── search_vector.py        # 向量搜索测试
 ├── docu/                       # 项目文档
+├── dist/                       # 打包产物（构建后生成）
+├── pyproject.toml              # Python 项目配置
 ├── requirements.txt            # Python 依赖
+├── INSTALL.md                  # 安装指南
+├── PACKAGE.md                  # 打包指南
 └── README.md                   # 项目说明
 ```
 
@@ -231,9 +243,10 @@ Mymom/
 ### 4. Web 界面
 - ✅ 记忆列表展示
 - ✅ 创建/编辑表单
-- ✅ 搜索界面（支持切换搜索模式）
+- ✅ 搜索界面（支持切换搜索模式：语义搜索/全文检索）
 - ✅ 快速创建建议
 - ✅ 统计信息显示
+- ✅ 用户画像页面（标签云图、饼图、柱状图）
 
 ## 快速开始
 
@@ -255,7 +268,23 @@ npm install
 
 ### 3. 启动服务
 
-**方式一：使用一键启动脚本（推荐）**
+**方式一：使用 CLI 命令（推荐，需先安装包）**
+
+```bash
+# 安装包（首次使用）
+pip install -e .
+
+# 启动服务（前台）
+mymom start
+
+# 启动服务（后台）
+mymom start --daemon
+
+# 检查服务状态
+mymom status
+```
+
+**方式二：使用一键启动脚本（开发模式）**
 
 ```bash
 python3 scripts/run_dev.py
@@ -263,7 +292,7 @@ python3 scripts/run_dev.py
 
 脚本会自动启动后端和前端服务，并显示访问地址。
 
-**方式二：手动启动**
+**方式三：手动启动（开发模式）**
 
 ```bash
 # 终端 1：启动后端服务
@@ -277,9 +306,9 @@ npm run dev
 
 ### 4. 访问应用
 
-- **前端界面**: http://localhost:5173（Vite 默认端口）
-- **后端 API**: http://localhost:8000
-- **API 文档**: http://localhost:8000/docs（Swagger UI）
+- **Web 界面**: http://127.0.0.1:7937（默认端口）
+- **API 文档**: http://127.0.0.1:7937/docs（Swagger UI）
+- **开发模式前端**: http://localhost:5173（仅手动启动前端时）
 
 ## API 接口
 
@@ -294,6 +323,7 @@ npm run dev
 ### 搜索
 
 - `POST /api/v1/search/` - 语义搜索（向量检索）
+- `POST /api/v1/search/sqlite` - 全文检索（SQLite FTS）
 
 ### 健康检查
 
@@ -303,8 +333,15 @@ npm run dev
 
 ### 数据存储位置
 
-- SQLite 数据库：`backend/data/memories.db`
-- ChromaDB 数据：`backend/data/chroma/`
+数据存储位置根据运行环境自动选择：
+
+- **开发环境**（项目目录存在 `.git`）：`./data/`
+  - SQLite 数据库：`./data/memories.db`
+  - ChromaDB 数据：`./data/chroma/`
+- **用户环境**：`~/.mymom/data/`
+  - SQLite 数据库：`~/.mymom/data/memories.db`
+  - ChromaDB 数据：`~/.mymom/data/chroma/`
+- **自定义位置**：通过环境变量 `MYMOM_DATA_PATH` 指定
 
 ### 配置说明
 
@@ -312,8 +349,15 @@ npm run dev
 
 主要配置项：
 - `embedding_model`: 向量化模型（默认：BAAI/bge-small-zh-v1.5）
-- `port`: 后端服务端口（默认：8000）
-- `data_dir`: 数据存储目录（默认：`backend/data/`）
+- `port`: 后端服务端口（默认：7937）
+- `host`: 服务主机（默认：127.0.0.1）
+- `data_dir`: 数据存储目录（智能选择：开发环境 `./data/`，用户环境 `~/.mymom/data/`）
+
+可通过环境变量配置（前缀 `MYMOM_`）：
+- `MYMOM_PORT`: 服务端口
+- `MYMOM_HOST`: 服务主机
+- `MYMOM_DATA_PATH`: 数据存储路径
+- `MYMOM_EMBEDDING_MODEL`: Embedding 模型
 
 ### 文本分块策略
 
@@ -323,7 +367,7 @@ npm run dev
 
 ## 开发状态
 
-当前版本：**v0.1 - 核心功能已完成**
+当前版本：**v0.1.0 - 核心功能已完成**
 
 - ✅ 后端 API 开发完成
 - ✅ 前端界面开发完成
@@ -331,6 +375,10 @@ npm run dev
 - ✅ 语义搜索功能实现
 - ✅ 全文检索功能实现
 - ✅ Web UI 交互完成
+- ✅ CLI 命令行工具（`mymom` 命令）
+- ✅ 打包和安装支持（pip install）
+- ✅ 用户画像可视化（标签统计）
+- ✅ 前端构建集成（静态文件自动部署）
 - ⏳ AI 编辑器集成（规划中）
 
 ## 相关文档
@@ -340,12 +388,43 @@ npm run dev
 - [技术选型文档](docu/技术选型文档.md)
 - [版本迭代规划](docu/版本迭代规划.md)
 
+## 安装和使用
+
+### 打包安装（生产环境）
+
+```bash
+# 1. 构建前端并打包
+python3 scripts/build_package.py
+
+# 2. 安装包
+pip install dist/mymom-0.1.0-py3-none-any.whl
+
+# 3. 使用 CLI 命令
+mymom start          # 前台启动
+mymom start --daemon # 后台启动
+mymom status         # 检查状态
+```
+
+详细安装说明请参考 [INSTALL.md](INSTALL.md) 和 [PACKAGE.md](PACKAGE.md)。
+
+### 开发模式
+
+```bash
+# 安装依赖
+pip install -r requirements.txt
+cd frontend && npm install
+
+# 启动开发服务器
+python3 scripts/run_dev.py
+```
+
 ## 注意事项
 
 1. **首次运行**：首次启动时会自动创建数据目录和数据库文件
-2. **模型下载**：首次使用向量搜索时会自动下载 embedding 模型（约 100MB）
-3. **端口占用**：确保 8000 和 5173 端口未被占用
+2. **模型下载**：首次使用向量搜索时会自动下载 embedding 模型（约 100MB），请确保网络连接正常
+3. **端口占用**：默认端口是 7937，如果被占用可以通过环境变量 `MYMOM_PORT` 修改
 4. **数据安全**：所有数据存储在本地，不会上传到云端
+5. **数据位置**：开发环境使用 `./data/`，用户环境使用 `~/.mymom/data/`，可通过 `MYMOM_DATA_PATH` 自定义
 
 ## 许可证
 

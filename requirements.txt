@@ -14,9 +14,11 @@ sentence-transformers==2.2.2
 numpy==1.26.3
 tiktoken==0.5.2
 
-# 数据验证
+# 配置管理
 pydantic==2.5.3
 pydantic-settings==2.1.0
+python-dotenv==1.0.0
+requests==2.31.0
 
 # HTTP 客户端
 httpx==0.26.0

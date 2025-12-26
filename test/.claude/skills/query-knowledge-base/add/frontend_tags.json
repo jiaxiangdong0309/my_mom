@@ -1,0 +1,24 @@
+{
+  "categories": [
+    {
+      "name": "前端技术栈",
+      "tags": ["React", "Vue", "TypeScript", "Next.js", "Vite", "TailwindCSS", "Zustand", "TanStack-Query", "ESLint"]
+    },
+    {
+      "name": "后端技术栈",
+      "tags": ["Node.js", "Python", "FastAPI", "Go", "SQLite", "PostgreSQL", "Redis", "Docker", "Nginx"]
+    },
+    {
+      "name": "开发场景",
+      "tags": ["Bug修复", "新功能开发", "性能优化", "代码重构", "接口设计", "部署上线", "环境配置", "安全加固"]
+    },
+    {
+      "name": "知识类型",
+      "tags": ["最佳实践", "踩坑记录", "学习笔记", "面试题", "工具推荐", "技术方案", "文档摘要"]
+    }
+  ],
+  "common_usage": [
+    "JavaScript", "CSS", "HTML", "Git", "Markdown", "Shell"
+  ]
+}
+

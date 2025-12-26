@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mymom"
+version = "0.1.0"
+description = "AI 知识记忆库 - 本地 RAG 工具"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "chromadb>=0.4.22",
+    "sentence-transformers>=2.2.2",
+    "numpy>=1.26.3",
+    "tiktoken>=0.5.2",
+    "pydantic>=2.5.3",
+    "pydantic-settings>=2.1.0",
+    "httpx>=0.26.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+]
+
+[project.scripts]
+mymom = "backend.main:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["backend*"]
+
+[tool.setuptools.package-data]
+backend = ["static/**/*"]
+
+[tool.setuptools]
+include-package-data = true
+

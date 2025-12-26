@@ -52,13 +52,14 @@ def signal_handler(sig, frame):
 def run_backend():
     """启动后端服务"""
     print("🚀 正在启动后端服务 (FastAPI)...")
-    os.chdir(BACKEND_DIR)
+    # 使用模块方式运行，支持相对导入
     process = subprocess.Popen(
-        [sys.executable, "main.py"],
+        [sys.executable, "-m", "backend.main"],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         universal_newlines=True,
-        bufsize=1
+        bufsize=1,
+        cwd=str(PROJECT_ROOT)  # 在项目根目录运行
     )
     return process
 

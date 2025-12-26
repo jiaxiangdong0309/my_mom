@@ -1,0 +1,11 @@
+include README.md
+include requirements.txt
+recursive-include backend/static *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude * .git*
+recursive-exclude * node_modules
+recursive-exclude * .env
+recursive-exclude * *.db
+recursive-exclude * *.sqlite3
+recursive-exclude * data/*
