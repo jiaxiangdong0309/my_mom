@@ -34,9 +34,17 @@ class SQLiteDB:
                 title TEXT NOT NULL,
                 content TEXT NOT NULL,
                 tags TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP
             )
         """)
+        # 如果表已存在但没有 updated_at 字段，则添加
+        try:
+            cursor.execute("ALTER TABLE memories ADD COLUMN updated_at TIMESTAMP")
+            self.conn.commit()
+        except sqlite3.OperationalError:
+            # 字段已存在，忽略错误
+            pass
         self.conn.commit()
 
     def create_memory(self, title: str, content: str, tags: List[str]) -> int:
@@ -75,13 +83,19 @@ class SQLiteDB:
         row = cursor.fetchone()
         if row is None:
             return None
-        return {
+        result = {
             "id": row["id"],
             "title": row["title"],
             "content": row["content"],
             "tags": json.loads(row["tags"]),
             "created_at": datetime.fromisoformat(row["created_at"]) if isinstance(row["created_at"], str) else row["created_at"]
         }
+        # 处理 updated_at 字段（可能为 None）
+        if "updated_at" in row.keys() and row["updated_at"] is not None:
+            result["updated_at"] = datetime.fromisoformat(row["updated_at"]) if isinstance(row["updated_at"], str) else row["updated_at"]
+        else:
+            result["updated_at"] = None
+        return result
 
     def get_all_memories(self) -> List[Dict]:
         """
@@ -95,13 +109,19 @@ class SQLiteDB:
         rows = cursor.fetchall()
         result = []
         for row in rows:
-            result.append({
+            memory_dict = {
                 "id": row["id"],
                 "title": row["title"],
                 "content": row["content"],
                 "tags": json.loads(row["tags"]),
                 "created_at": datetime.fromisoformat(row["created_at"]) if isinstance(row["created_at"], str) else row["created_at"]
-            })
+            }
+            # 处理 updated_at 字段（可能为 None）
+            if "updated_at" in row.keys() and row["updated_at"] is not None:
+                memory_dict["updated_at"] = datetime.fromisoformat(row["updated_at"]) if isinstance(row["updated_at"], str) else row["updated_at"]
+            else:
+                memory_dict["updated_at"] = None
+            result.append(memory_dict)
         return result
 
     def get_memories_by_ids(self, ids: List[int]) -> List[Dict]:
@@ -122,14 +142,42 @@ class SQLiteDB:
         rows = cursor.fetchall()
         result = []
         for row in rows:
-            result.append({
+            memory_dict = {
                 "id": row["id"],
                 "title": row["title"],
                 "content": row["content"],
                 "tags": json.loads(row["tags"]),
                 "created_at": datetime.fromisoformat(row["created_at"]) if isinstance(row["created_at"], str) else row["created_at"]
-            })
+            }
+            # 处理 updated_at 字段（可能为 None）
+            if "updated_at" in row.keys() and row["updated_at"] is not None:
+                memory_dict["updated_at"] = datetime.fromisoformat(row["updated_at"]) if isinstance(row["updated_at"], str) else row["updated_at"]
+            else:
+                memory_dict["updated_at"] = None
+            result.append(memory_dict)
         return result
+
+    def update_memory(self, memory_id: int, title: str, content: str, tags: List[str]) -> bool:
+        """
+        更新记录
+
+        Args:
+            memory_id: 记录 ID
+            title: 标题
+            content: 内容
+            tags: 标签列表
+
+        Returns:
+            是否成功
+        """
+        cursor = self.conn.cursor()
+        tags_json = json.dumps(tags, ensure_ascii=False)
+        cursor.execute(
+            "UPDATE memories SET title = ?, content = ?, tags = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (title, content, tags_json, memory_id)
+        )
+        self.conn.commit()
+        return cursor.rowcount > 0
 
     def delete_memory(self, memory_id: int) -> bool:
         """
@@ -148,7 +196,7 @@ class SQLiteDB:
 
     def search_memories(self, query: str) -> List[Dict]:
         """
-        关键字搜索（标题或内容）
+        关键字搜索（标题、内容或标签）
 
         Args:
             query: 搜索关键字
@@ -158,20 +206,41 @@ class SQLiteDB:
         """
         cursor = self.conn.cursor()
         search_pattern = f"%{query}%"
+
+        # 打印搜索信息
+        print(f"[SQLiteDB] 执行关键字搜索", flush=True)
+        print(f"[SQLiteDB] 搜索模式: '{search_pattern}'", flush=True)
+        print(f"[SQLiteDB] SQL查询: SELECT * FROM memories WHERE title LIKE ? OR content LIKE ? OR tags LIKE ? ORDER BY created_at DESC", flush=True)
+
         cursor.execute(
-            "SELECT * FROM memories WHERE title LIKE ? OR content LIKE ? ORDER BY created_at DESC",
-            (search_pattern, search_pattern)
+            "SELECT * FROM memories WHERE title LIKE ? OR content LIKE ? OR tags LIKE ? ORDER BY created_at DESC",
+            (search_pattern, search_pattern, search_pattern)
         )
         rows = cursor.fetchall()
+
+        print(f"[SQLiteDB] SQL查询返回 {len(rows)} 行", flush=True)
+
         result = []
-        for row in rows:
-            result.append({
+        for idx, row in enumerate(rows, 1):
+            memory_dict = {
                 "id": row["id"],
                 "title": row["title"],
                 "content": row["content"],
                 "tags": json.loads(row["tags"]),
                 "created_at": datetime.fromisoformat(row["created_at"]) if isinstance(row["created_at"], str) else row["created_at"]
-            })
+            }
+            # 处理 updated_at 字段（可能为 None）
+            if "updated_at" in row.keys() and row["updated_at"] is not None:
+                memory_dict["updated_at"] = datetime.fromisoformat(row["updated_at"]) if isinstance(row["updated_at"], str) else row["updated_at"]
+            else:
+                memory_dict["updated_at"] = None
+            result.append(memory_dict)
+
+            # 打印每条记录的简要信息
+            title_short = memory_dict["title"][:40] + "..." if len(memory_dict["title"]) > 40 else memory_dict["title"]
+            print(f"[SQLiteDB]   结果 {idx}: [ID:{memory_dict['id']}] {title_short}", flush=True)
+
+        print(f"[SQLiteDB] 搜索完成，返回 {len(result)} 条记录", flush=True)
         return result
 
     def count(self) -> int:

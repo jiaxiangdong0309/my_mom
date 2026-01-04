@@ -1,14 +1,23 @@
 /**
- * 创建记忆表单组件
+ * 创建/编辑记忆表单组件
  */
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
-function MemoryForm({ onSubmit, onCancel, initialData = null }) {
+function MemoryForm({ onSubmit, onCancel, initialData = null, isEdit = false }) {
   const [title, setTitle] = useState(initialData?.title || '')
   const [content, setContent] = useState(initialData?.content || '')
   const [tags, setTags] = useState(initialData?.tags?.join(', ') || '')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  // 当 initialData 变化时更新表单数据
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title || '')
+      setContent(initialData.content || '')
+      setTags(initialData.tags?.join(', ') || '')
+    }
+  }, [initialData])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -50,7 +59,7 @@ function MemoryForm({ onSubmit, onCancel, initialData = null }) {
 
   return (
     <form className="memory-form" onSubmit={handleSubmit}>
-      <h2>创建新记忆</h2>
+      <h2>{isEdit ? '编辑记忆' : '创建新记忆'}</h2>
 
       {error && <div className="form-error">{error}</div>}
 
@@ -97,7 +106,7 @@ function MemoryForm({ onSubmit, onCancel, initialData = null }) {
           </button>
         )}
         <button type="submit" disabled={submitting}>
-          {submitting ? '创建中...' : '创建记忆'}
+          {submitting ? (isEdit ? '保存中...' : '创建中...') : (isEdit ? '保存修改' : '创建记忆')}
         </button>
       </div>
     </form>

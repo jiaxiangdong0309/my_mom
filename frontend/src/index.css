@@ -562,9 +562,15 @@ button:disabled {
 .memory-detail-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
+}
+
+.memory-detail-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .back-button {
@@ -575,6 +581,22 @@ button:disabled {
 
 .back-button:hover {
   background-color: var(--background);
+  border-color: var(--text-secondary);
+}
+
+/* Dialog中的关闭按钮样式 */
+.dialog-container .back-button {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.edit-button {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: var(--primary-hover);
 }
 
 .delete-button {
@@ -588,8 +610,12 @@ button:disabled {
 
 .memory-detail-content h1 {
   font-size: 2rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: var(--text-primary);
+}
+
+.dialog-container .memory-detail-content h1 {
+  margin-bottom: 1rem;
 }
 
 .memory-detail-meta {
@@ -598,9 +624,9 @@ button:disabled {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: none;
 }
 
 .memory-detail-tags {
@@ -1177,6 +1203,133 @@ button:disabled {
   100% { transform: rotate(360deg); }
 }
 
+/* Dialog样式 */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+  /* 防止滚动穿透 */
+  overscroll-behavior: contain;
+  /* 确保 overlay 本身不滚动，只有内容滚动 */
+  overflow: hidden;
+}
+
+.dialog-container {
+  background-color: var(--surface);
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 800px;
+  width: 100%;
+  max-height: calc(100vh - 2rem);
+  margin: auto;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+  /* 防止滚动穿透 */
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dialog-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dialog-container::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 4px;
+}
+
+.dialog-container::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dialog-container .memory-detail {
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 固定在顶部的部分 */
+.dialog-container .memory-detail-header {
+  flex-shrink: 0;
+  padding: 1.5rem 2rem;
+  margin-bottom: 0;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.dialog-container .memory-detail-fixed {
+  flex-shrink: 0;
+  padding: 1.5rem 2rem 0;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.dialog-container .memory-detail-content {
+  padding-bottom: 1.5rem;
+}
+
+/* 可滚动的内容区域 */
+.dialog-container .memory-detail-body-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 2rem 2rem;
+  /* 确保滚动条样式 */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.dialog-container .memory-detail-body-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dialog-container .memory-detail-body-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dialog-container .memory-detail-body-scrollable::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 4px;
+}
+
+.dialog-container .memory-detail-body-scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary);
+}
+
+.dialog-container .memory-detail-body {
+  padding-top: 1.5rem;
+}
+
 @media (max-width: 768px) {
   .charts-grid {
     grid-template-columns: 1fr;
@@ -1190,6 +1343,28 @@ button:disabled {
   .profile-summary {
     width: 100%;
     justify-content: space-around;
+  }
+
+  .dialog-container {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .dialog-container .memory-detail-header {
+    padding: 1rem 1.5rem;
+  }
+
+  .dialog-container .memory-detail-fixed {
+    padding: 1rem 1.5rem 0;
+  }
+
+  .dialog-container .memory-detail-body-scrollable {
+    padding: 0 1.5rem 1.5rem;
+  }
+
+  .dialog-container .memory-detail-content h1 {
+    font-size: 1.5rem;
   }
 }
 

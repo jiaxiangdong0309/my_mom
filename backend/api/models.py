@@ -18,6 +18,7 @@ class MemoryResponse(BaseModel):
     content: str
     tags: List[str]
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
 class SearchRequest(BaseModel):
     """搜索请求"""

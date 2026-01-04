@@ -10,7 +10,7 @@ import SearchBar from './components/SearchBar'
 import SearchResults from './components/SearchResults'
 import SuggestionCard from './components/SuggestionCard'
 import UserProfile from './components/UserProfile'
-import { createMemory, deleteMemory, searchMemories, searchMemoriesSQLite, getAllMemories, getStats } from './api'
+import { createMemory, updateMemory, deleteMemory, searchMemories, searchMemoriesSQLite, getAllMemories, getStats } from './api'
 import { generateRandomSuggestions } from './utils/randomSuggestions'
 
 function App() {
@@ -22,6 +22,7 @@ function App() {
   const [searchResults, setSearchResults] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedMemoryId, setSelectedMemoryId] = useState(null)
+  const [showDetailDialog, setShowDetailDialog] = useState(false) // 控制详情dialog显示
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
@@ -52,12 +53,45 @@ function App() {
 
   // 生成随机建议 - 每次进入页面时生成
   useEffect(() => {
-    const pagesWithSuggestions = ['list', 'create', 'detail', 'search']
+    const pagesWithSuggestions = ['list', 'create', 'search']
     if (pagesWithSuggestions.includes(currentPage)) {
       const newSuggestions = generateRandomSuggestions(3)
       setSuggestions(newSuggestions)
     }
   }, [currentPage])
+
+  // 控制弹窗打开时禁用页面滚动
+  useEffect(() => {
+    if (showDetailDialog) {
+      // 保存当前滚动位置
+      const scrollY = window.scrollY
+      // 禁用body滚动
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.width = '100%'
+      document.body.style.overflow = 'hidden'
+    } else {
+      // 恢复body滚动
+      const scrollY = document.body.style.top
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      document.body.style.overflow = ''
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1)
+      }
+    }
+
+    // 清理函数
+    return () => {
+      if (!showDetailDialog) {
+        document.body.style.position = ''
+        document.body.style.top = ''
+        document.body.style.width = ''
+        document.body.style.overflow = ''
+      }
+    }
+  }, [showDetailDialog])
 
   // 加载统计信息
   useEffect(() => {
@@ -150,6 +184,25 @@ function App() {
     }
   }
 
+  // 更新记忆
+  const handleUpdateMemory = async (id, data) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const updatedMemory = await updateMemory(id, data.title, data.content, data.tags)
+      // 更新记忆列表
+      setMemories(memories.map(m => m.id === id ? updatedMemory : m))
+      // 更新搜索结果
+      setSearchResults(searchResults.map(m => m.id === id ? updatedMemory : m))
+      setRefreshTrigger(prev => prev + 1)
+    } catch (err) {
+      setError(err.message || '更新失败')
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // 点击建议卡片，直接创建记忆
   const handleSuggestionClick = async (suggestion) => {
     await handleCreateMemory(suggestion)
@@ -163,8 +216,8 @@ function App() {
       await deleteMemory(id)
       setMemories(memories.filter(m => m.id !== id))
       setSearchResults(searchResults.filter(m => m.id !== id))
-      if (currentPage === 'detail' && selectedMemoryId === id) {
-        setCurrentPage('list')
+      if (selectedMemoryId === id) {
+        setShowDetailDialog(false)
         setSelectedMemoryId(null)
       }
       setRefreshTrigger(prev => prev + 1)
@@ -175,10 +228,16 @@ function App() {
     }
   }
 
-  // 查看记忆详情
+  // 查看记忆详情 - 使用dialog展示
   const handleMemoryClick = (id) => {
     setSelectedMemoryId(id)
-    setCurrentPage('detail')
+    setShowDetailDialog(true)
+  }
+
+  // 关闭详情dialog
+  const handleCloseDetailDialog = () => {
+    setShowDetailDialog(false)
+    setSelectedMemoryId(null)
   }
 
   // 返回列表
@@ -234,16 +293,6 @@ function App() {
             <MemoryForm
               onSubmit={handleCreateMemory}
               onCancel={handleBack}
-            />
-          </div>
-        )
-      case 'detail':
-        return (
-          <div className="page-container fadeIn">
-            <MemoryDetail
-              memoryId={selectedMemoryId}
-              onBack={handleBack}
-              onDelete={handleDeleteMemory}
             />
           </div>
         )
@@ -313,7 +362,7 @@ function App() {
   const renderNav = () => (
     <>
       <div
-        className={`nav-item ${(currentPage === 'list' || currentPage === 'detail' || currentPage === 'create') ? 'active' : ''}`}
+        className={`nav-item ${(currentPage === 'list' || currentPage === 'create') ? 'active' : ''}`}
         onClick={() => {
           setCurrentPage('list')
           setSearchQuery('')
@@ -350,6 +399,23 @@ function App() {
 
         {renderPage()}
       </div>
+
+      {/* 详情Dialog */}
+      {showDetailDialog && (
+        <div className="dialog-overlay" onClick={handleCloseDetailDialog}>
+          <div className="dialog-container" onClick={(e) => e.stopPropagation()}>
+            <MemoryDetail
+              memoryId={selectedMemoryId}
+              onBack={handleCloseDetailDialog}
+              onDelete={(id) => {
+                handleDeleteMemory(id)
+                handleCloseDetailDialog()
+              }}
+              onUpdate={handleUpdateMemory}
+            />
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }

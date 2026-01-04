@@ -12,17 +12,33 @@ class Settings(BaseSettings):
     base_dir: str = os.path.dirname(os.path.abspath(__file__))
     project_root: Path = Path(base_dir).parent
 
+    # 环境设置 (dev, prod, auto)
+    # 支持通过环境变量 MYMOM_ENV 覆盖
+    env: str = "auto"
+
+    @property
+    def is_dev(self) -> bool:
+        """统一判断是否为开发环境"""
+        env_val = self.env.lower()
+        if env_val in ["dev", "development"]:
+            return True
+        if env_val in ["prod", "production"]:
+            return False
+
+        # 默认逻辑 (auto): 检查是否存在 .git 目录
+        return (self.project_root / ".git").exists()
+
     # 智能路径管理
     # 1. 优先使用环境变量 MYMOM_DATA_PATH
-    # 2. 如果当前目录存在 .git，说明是开发环境，使用 ./data
+    # 2. 如果是开发环境，使用项目根目录下的 ./data
     # 3. 否则认为是用户环境，使用 ~/.mymom/data
     def _get_default_data_dir(self) -> str:
         env_path = os.getenv("MYMOM_DATA_PATH")
         if env_path:
             return os.path.abspath(env_path)
 
-        # 判断是否为开发环境 (检查项目根目录是否有 .git)
-        if (self.project_root / ".git").exists():
+        # 使用统一的环境判断属性
+        if self.is_dev:
             return str(self.project_root / "data")
 
         # 用户环境，存放在家目录

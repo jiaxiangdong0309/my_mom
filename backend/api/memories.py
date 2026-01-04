@@ -101,6 +101,88 @@ async def get_memory(memory_id: int):
         raise HTTPException(status_code=404, detail="Memory not found")
     return MemoryResponse(**memory)
 
+@router.put("/{memory_id}", response_model=MemoryResponse)
+async def update_memory(memory_id: int, data: MemoryCreate):
+    """修改记忆"""
+    try:
+        # 1. 检查记录是否存在
+        existing_memory = sqlite_db.get_memory(memory_id)
+        if existing_memory is None:
+            raise HTTPException(status_code=404, detail="Memory not found")
+
+        # 2. 更新 SQLite 记录
+        success = sqlite_db.update_memory(
+            memory_id=memory_id,
+            title=data.title,
+            content=data.content,
+            tags=data.tags
+        )
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to update memory")
+
+        # 3. 删除 ChromaDB 中的旧向量
+        collection = chroma_db.collection
+        all_docs = collection.get()
+        chunk_ids_to_delete = []
+
+        for doc_id in all_docs["ids"]:
+            # 检查是否是旧格式（纯数字ID）
+            if doc_id == str(memory_id):
+                chunk_ids_to_delete.append(doc_id)
+            # 检查是否是新格式（memory_id:chunk_index）
+            elif doc_id.startswith(f"{memory_id}:"):
+                chunk_ids_to_delete.append(doc_id)
+
+        # 批量删除所有相关的块
+        if chunk_ids_to_delete:
+            chroma_db.delete(ids=chunk_ids_to_delete)
+
+        # 4. 重新切分文本并生成向量
+        full_text = f"{data.title}\n{data.content}"
+        text_chunks = split_text_by_chars(full_text, chunk_size=1000, overlap=100)
+
+        # 5. 为每个文本块生成向量并存储
+        if text_chunks:
+            embeddings_list = []
+            ids_list = []
+            metadatas_list = []
+
+            for chunk_index, chunk in enumerate(text_chunks):
+                # 生成向量
+                embedding = embedder.encode(chunk)
+                embeddings_list.append(embedding)
+
+                # 使用 memory_id:chunk_index 作为唯一ID
+                chunk_id = f"{memory_id}:{chunk_index}"
+                ids_list.append(chunk_id)
+
+                # 存储元数据，包含原始记忆ID和块索引
+                metadatas_list.append({
+                    "memory_id": memory_id,
+                    "chunk_index": chunk_index,
+                    "title": data.title,
+                    "total_chunks": len(text_chunks)
+                })
+
+            # 批量添加到 ChromaDB
+            embeddings_array = np.array(embeddings_list)
+            chroma_db.add_vectors(
+                ids=ids_list,
+                embeddings=embeddings_array,
+                metadatas=metadatas_list
+            )
+
+        # 6. 获取更新后的记录返回
+        memory = sqlite_db.get_memory(memory_id)
+        if memory is None:
+            raise HTTPException(status_code=500, detail="Failed to retrieve updated memory")
+
+        return MemoryResponse(**memory)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.delete("/{memory_id}")
 async def delete_memory(memory_id: int):
     """删除记忆"""

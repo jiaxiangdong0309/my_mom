@@ -103,6 +103,25 @@ export async function getMemory(id) {
 }
 
 /**
+ * 更新记忆
+ */
+export async function updateMemory(id, title, content, tags = []) {
+  try {
+    const response = await fetch(`${BASE_URL}/memories/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content, tags })
+    })
+    return await handleResponse(response)
+  } catch (error) {
+    if (error.message.includes('Failed to fetch')) {
+      throw new Error('无法连接到服务器，请检查后端服务是否启动')
+    }
+    throw error
+  }
+}
+
+/**
  * 删除记忆
  */
 export async function deleteMemory(id) {

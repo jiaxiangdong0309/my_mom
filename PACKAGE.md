@@ -1,6 +1,69 @@
 # 打包和安装指南
 
-## 快速开始
+## 环境要求
+
+- Python 3.11+
+- Node.js 18+ 和 npm
+
+---
+
+## 一、本地运行（开发模式）
+
+适用于开发和测试，代码修改后立即生效。
+
+### 1. 安装依赖
+
+```bash
+# 安装 Python 依赖
+pip install -r requirements.txt
+
+# 安装前端依赖
+cd frontend
+npm install
+```
+
+### 2. 可编辑安装（推荐）
+
+```bash
+# 安装包（可编辑模式）
+pip install -e .
+```
+
+这样修改代码后无需重新安装。
+
+### 3. 启动服务
+
+**方式一：使用一键启动脚本（推荐）**
+
+```bash
+python3 scripts/run_dev.py
+```
+
+脚本会自动启动后端和前端开发服务器，并显示访问地址。
+
+**方式二：手动启动（前后端分离）**
+
+```bash
+# 终端 1：启动后端服务
+cd backend
+python3 main.py
+
+# 终端 2：启动前端开发服务器
+cd frontend
+npm run dev
+```
+
+### 4. 访问应用
+
+- **Web 界面**: http://127.0.0.1:7937（默认端口）
+- **API 文档**: http://127.0.0.1:7937/docs（Swagger UI）
+- **开发模式前端**: http://localhost:5173（仅手动启动前端时）
+
+---
+
+## 二、打包执行（生产环境）
+
+适用于生产部署，生成可分发的安装包。
 
 ### 1. 一键打包
 
@@ -15,48 +78,6 @@ python3 scripts/build_package.py
 ### 2. 安装包
 
 ```bash
-pip install dist/mymom-0.1.0-py3-none-any.whl
-```
-
-### 3. 运行
-
-```bash
-# 启动服务
-mymom start
-
-# 检查状态
-mymom status
-
-# 后台启动
-mymom start --daemon
-```
-
-### 4. 访问
-
-- Web 界面: http://127.0.0.1:7937
-- API 文档: http://127.0.0.1:7937/docs
-
-## 详细步骤
-
-### 步骤 1: 构建前端
-
-```bash
-python3 scripts/build_dist.py
-```
-
-### 步骤 2: 构建 Python 包
-
-```bash
-# 安装构建工具
-pip install build wheel
-
-# 构建包
-python3 -m build
-```
-
-### 步骤 3: 安装
-
-```bash
 # 从 wheel 文件安装（推荐）
 pip install dist/mymom-0.1.0-py3-none-any.whl
 
@@ -64,55 +85,72 @@ pip install dist/mymom-0.1.0-py3-none-any.whl
 pip install dist/mymom-0.1.0.tar.gz
 ```
 
-### 步骤 4: 使用
-
-安装后，`mymom` 命令会被添加到系统 PATH：
+### 3. 启动服务
 
 ```bash
-# 查看帮助
-mymom --help
-
-# 启动服务（前台）
+# 前台启动（自动检测为生产模式）
 mymom start
 
-# 启动服务（后台）
-mymom start --daemon
+# 后台启动
+mymom start --bg
 
 # 检查服务状态
 mymom status
+
+# 停止服务
+mymom stop
 ```
 
-## 开发模式安装
+> **说明**：`mymom start` 会自动检测环境。在生产环境（无 `.git` 目录）下，会以生产模式启动（无代码热重载）。
 
-如果你想在开发时直接使用，可以使用可编辑安装：
+### 4. 访问应用
 
-```bash
-pip install -e .
-```
+- **Web 界面**: http://127.0.0.1:7937（默认端口）
+- **API 文档**: http://127.0.0.1:7937/docs（Swagger UI）
 
-这样修改代码后无需重新安装。
-
-## 卸载
+### 5. 卸载
 
 ```bash
 pip uninstall mymom
 ```
 
-## 注意事项
+---
 
-1. **首次运行**：首次启动时会自动下载 embedding 模型（约 100MB）
-2. **数据存储**：
-   - 开发环境：`./data/`
-   - 用户环境：`~/.mymom/data/`
-   - 自定义：设置 `MYMOM_DATA_PATH` 环境变量
-3. **端口配置**：默认 7937，可通过 `MYMOM_PORT` 环境变量修改
+## 配置说明
 
-## 环境变量
+### 环境变量
 
-- `MYMOM_DATA_PATH`: 数据存储路径
+可通过环境变量配置（前缀 `MYMOM_`）：
+
 - `MYMOM_PORT`: 服务端口（默认：7937）
 - `MYMOM_HOST`: 服务主机（默认：127.0.0.1）
-- `MYMOM_EMBEDDING_MODEL`: Embedding 模型
+- `MYMOM_DATA_PATH`: 数据存储路径（覆盖自动选择）
+- `MYMOM_EMBEDDING_MODEL`: Embedding 模型（默认：BAAI/bge-small-zh-v1.5）
+- `MYMOM_ENV`: 环境模式（dev/prod/auto，默认：auto）
+
+### 数据存储位置
+
+数据存储位置根据运行环境自动选择：
+
+- **开发环境**（项目目录存在 `.git`）：`./data/`
+  - SQLite 数据库：`./data/memories.db`
+  - ChromaDB 数据：`./data/chroma/`
+- **用户环境**：`~/.mymom/data/`
+  - SQLite 数据库：`~/.mymom/data/memories.db`
+  - ChromaDB 数据：`~/.mymom/data/chroma/`
+- **自定义位置**：通过环境变量 `MYMOM_DATA_PATH` 指定
+
+---
+
+## 注意事项
+
+1. **首次运行**：首次启动时会自动创建数据目录和数据库文件
+2. **模型下载**：首次使用向量搜索时会自动下载 embedding 模型（约 100MB），请确保网络连接正常
+3. **端口占用**：默认端口是 7937，如果被占用可以通过环境变量 `MYMOM_PORT` 修改
+4. **数据安全**：所有数据存储在本地，不会上传到云端
+5. **前端构建**：前端构建产物会自动集成到 `backend/static/`，支持单端口访问
+
+---
 
 ## 故障排查
 
@@ -133,4 +171,3 @@ pip uninstall mymom
 **解决方案**：
 - 使用 `MYMOM_PORT` 环境变量指定其他端口
 - 或通过 `mymom status` 检查是否有旧进程在运行
-
