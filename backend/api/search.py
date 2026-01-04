@@ -225,28 +225,41 @@ async def search_sqlite(data: SearchRequest):
     print(f"[SQLite搜索] 数据库返回 {len(memories)} 条记录", flush=True)
 
     results = []
+    import math
     for memory in memories:
+        # FTS5 rank 转换逻辑修复：
+        # rank 越小（越负）表示越匹配。
+        # 我们使用 Sigmoid 函数将 rank 映射到 0-1 之间：relevance = 1 / (1 + exp(rank))
+        rank = memory.get("rank", 0)
+
+        try:
+            # 使用 Sigmoid 函数：rank=-10 -> 0.999, rank=0 -> 0.5, rank=10 -> 0.0001
+            relevance = 1.0 / (1.0 + math.exp(rank))
+        except OverflowError:
+            # 极端情况处理
+            relevance = 1.0 if rank < 0 else 0.0
+
         results.append(SearchResult(
             id=memory["id"],
             title=memory["title"],
             content=memory["content"],
             tags=memory["tags"],
             created_at=memory["created_at"],
-            relevance=1.0  # 关键字匹配默认相关度为 1.0
+            relevance=relevance
         ))
+
+    # 显式按相关度降序排序（确保分数最高的排在最前面）
+    results.sort(key=lambda x: x.relevance, reverse=True)
 
     # 格式化结果输出
     def format_result_list(result_list, prefix="  "):
-        """格式化结果列表，显示id、title和tags"""
+        """格式化结果列表，显示id、title和评分"""
         if not result_list:
             return ""
         lines = []
         for i, r in enumerate(result_list, 1):
             title_short = r.title[:30] + "..." if len(r.title) > 30 else r.title
-            tags_str = ", ".join(r.tags[:3]) if r.tags else "无标签"
-            if r.tags and len(r.tags) > 3:
-                tags_str += f" (+{len(r.tags)-3}个)"
-            lines.append(f"{prefix}{i}. [ID:{r.id}] {title_short} (标签: {tags_str})")
+            lines.append(f"{prefix}{i}. [ID:{r.id}] {title_short} (评分: {r.relevance:.4f})")
         return "\n".join(lines)
 
     print(f"[SQLite搜索] 处理后的结果: {len(results)} 条", flush=True)
