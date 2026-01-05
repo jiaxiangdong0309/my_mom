@@ -16,8 +16,14 @@ import signal
 import time
 from pathlib import Path
 
-# 获取项目根目录
+# 添加项目根目录到 sys.path，以便导入 backend.config
 PROJECT_ROOT = Path(__file__).parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from backend.config import settings
+
+# 基础目录配置
 BACKEND_DIR = PROJECT_ROOT / "backend"
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
 
@@ -151,10 +157,11 @@ def main():
     print("=" * 60)
     print("✅ 服务启动成功！")
     print("=" * 60)
-    print("📡 后端 API: http://localhost:8000")
-    print("🌐 前端界面: http://localhost:5173")
-    print("📚 API 文档: http://localhost:8000/docs")
+    print(f"🏠 访问地址: http://localhost:{settings.port}")
+    print(f"📚 API 文档: http://localhost:{settings.port}/docs")
     print()
+    print("💡 提示: 后端已集成前端静态资源，直接访问上述地址即可")
+    print("💡 开发: 前端开发服务器运行在 3000 端口（支持热更新）")
     print("💡 提示: 按 Ctrl+C 停止所有服务")
     print("=" * 60)
     print()

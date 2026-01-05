@@ -54,4 +54,5 @@ Thumbs.db
 *.log
 
 openspec/
-
+.cursor/commands/
+*.claude/
