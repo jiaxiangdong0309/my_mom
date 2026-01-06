@@ -85,7 +85,26 @@ pip install dist/mymom-0.1.0-py3-none-any.whl
 pip install dist/mymom-0.1.0.tar.gz
 ```
 
-### 3. 启动服务
+### 3. 检查安装状态
+
+在启动服务前，可以先检查 mymom 是否已正确安装：
+
+```bash
+# 方法一：查看帮助信息（如果已安装会显示帮助）
+mymom --help
+# 或直接运行
+mymom
+
+# 方法二：查看命令路径（Linux/Mac）
+which mymom
+
+# 方法三：查看包详细信息（包括版本、安装位置等）
+pip show mymom
+```
+
+如果命令不存在或提示找不到，请先执行安装步骤（见上方"安装包"部分）。
+
+### 4. 启动服务
 
 ```bash
 # 前台启动（自动检测为生产模式）
@@ -103,12 +122,12 @@ mymom stop
 
 > **说明**：`mymom start` 会自动检测环境。在生产环境（无 `.git` 目录）下，会以生产模式启动（无代码热重载）。
 
-### 4. 访问应用
+### 5. 访问应用
 
 - **Web 界面**: http://127.0.0.1:7937（默认端口）
 - **API 文档**: http://127.0.0.1:7937/docs（Swagger UI）
 
-### 5. 卸载
+### 6. 卸载
 
 ```bash
 pip uninstall mymom
