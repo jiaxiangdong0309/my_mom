@@ -116,6 +116,57 @@ pip uninstall mymom
 
 ---
 
+## 三、发布到 PyPI（可选）
+
+适用于开发者将包发布到官方 [PyPI](https://pypi.org/) 或 [TestPyPI](https://test.pypi.org/)。
+
+### 1. 准备工作
+
+发布前需要安装必要的工具，并获取 PyPI 的 API Token。
+
+```bash
+# 安装发布工具
+pip install twine python-dotenv
+```
+
+在项目根目录创建 `.env` 文件，并添加你的 API Token：
+
+```env
+# 正式 PyPI Token (pypi-xxxx...)
+PYPI_TOKEN=your_pypi_token
+
+# TestPyPI Token (pypi-xxxx...)
+TEST_PYPI_TOKEN=your_test_pypi_token
+```
+
+### 2. 发布到 TestPyPI（推荐先在测试环境验证）
+
+```bash
+python3 scripts/publish_test.py
+```
+
+该脚本会自动执行构建、检查、并上传到 TestPyPI。发布后可以通过以下命令测试安装：
+
+```bash
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ mymom
+```
+
+### 3. 发布到正式 PyPI
+
+确认一切正常后，可以发布到正式环境：
+
+```bash
+python3 scripts/publish.py
+```
+
+### 4. 发布参数说明
+
+`scripts/publish.py` 支持以下参数：
+- `--test`: 发布到 TestPyPI。
+- `--skip-build`: 跳过构建步骤，直接使用现有的 `dist/` 文件。
+
+---
+
 ## 配置说明
 
 ### 环境变量
