@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mymom"
-version = "0.1.1"
+version = "0.1.2"
 description = "AI 知识记忆库 - 本地 RAG 工具"
 readme = "README.md"
 requires-python = ">=3.11"
