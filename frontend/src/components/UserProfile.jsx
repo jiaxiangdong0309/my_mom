@@ -44,7 +44,7 @@ function UserProfile({ tagStats, totalMemories, onBack, loading }) {
 
       <div className="profile-content">
         <section className="chart-section">
-          <h3>标签云图</h3>
+          <h3>标签词云</h3>
           <p className="chart-desc">标签越大，代表你在该领域记录的内容越多</p>
           <div className="chart-container word-cloud-container">
             <TagWordCloud data={tagStats} />

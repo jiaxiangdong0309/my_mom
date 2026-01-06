@@ -1132,6 +1132,14 @@ button:disabled {
   min-height: 400px;
 }
 
+.word-cloud-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--text-secondary);
+}
+
 .charts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));

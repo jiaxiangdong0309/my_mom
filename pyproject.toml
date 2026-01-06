@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mymom"
-version = "0.1.0"
+version = "0.1.1"
 description = "AI 知识记忆库 - 本地 RAG 工具"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -21,6 +21,36 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "requests>=2.31.0",
 ]
+authors = [
+    {name = "xiangdongjia", email = "jiaxiangdong0103@163.com"},
+]
+license = "MIT"
+keywords = [
+    "ai",
+    "rag",
+    "knowledge-base",
+    "vector-search",
+    "semantic-search",
+    "chromadb",
+    "sqlite",
+    "memory",
+    "local-storage",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+[project.urls]
+Homepage = "https://github.com/xiangdongjia/mymom"
+Documentation = "https://github.com/xiangdongjia/mymom#readme"
+Repository = "https://github.com/xiangdongjia/mymom"
+Issues = "https://github.com/xiangdongjia/mymom/issues"
 
 [project.scripts]
 mymom = "backend.main:cli"

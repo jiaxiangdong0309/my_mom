@@ -71,6 +71,7 @@ class Settings(BaseSettings):
     class Config:
         env_prefix = "MYMOM_"
         env_file = ".env"
+        extra = "ignore"  # 忽略未定义的字段（如 PYPI_TOKEN、TEST_PYPI_TOKEN 等）
 
 settings = Settings()
 
