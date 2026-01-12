@@ -11,7 +11,7 @@ import sys
 try:
     import requests
 except ImportError:
-    sys.stderr.write("错误: 需要安装 mymom 环境或单独安装 requests 库\n")
+    sys.stderr.write("错误: 需要安装 mymem 环境或单独安装 requests 库\n")
     sys.stderr.write("请运行: pip install requests 或安装主程序\n")
     sys.exit(1)
 
@@ -30,8 +30,8 @@ def search_sqlite(api_url, query):
     except requests.exceptions.ConnectionError:
         raise ConnectionError(
             f"无法连接到后端服务 ({api_url})。\n"
-            f"请确保 Mymom 服务已启动：\n"
-            f"  mymom start"
+            f"请确保 Mymem 服务已启动：\n"
+            f"  mymem start"
         )
     except Exception as e:
         raise RuntimeError(f"搜索失败: {str(e)}")

@@ -1,4 +1,4 @@
-# AI 知识记忆库 (Mymom)
+# AI 知识记忆库 (Mymem)
 
 一个为 AI 编辑器用户提供的**本地知识记忆与检索工具**，支持结构化存储、语义搜索和全文检索，解决跨会话、跨编辑器的经验积累和复用问题。
 
@@ -31,13 +31,16 @@ AI 知识记忆库是一个本地部署的知识管理系统，采用 **SQLite +
 ## 界面预览
 
 ### 首页
-![首页](assess/首页.png)
+
+首页
 
 ### 搜索功能
-![搜索](assess/搜索.png)
+
+搜索
 
 ### 用户画像
-![用户画像](assess/用户画像.png)
+
+用户画像
 
 ---
 
@@ -51,48 +54,46 @@ AI 知识记忆库是一个本地部署的知识管理系统，采用 **SQLite +
 
 ```bash
 # 从 TestPyPI 安装
-pip install -i https://test.pypi.org/simple/ mymom
+pip install -i https://test.pypi.org/simple/ mymem
 ```
 
 ### 2. 启动服务
 
-安装完成后，可以直接使用 `mymom` 命令：
+安装完成后，可以直接使用 `mymem` 命令：
 
 ```bash
 # 前台启动
-mymom start
+mymem start
 
 # 后台启动
-mymom start --bg
+mymem start --bg
 ```
 
 启动后，访问浏览器：[http://127.0.0.1:7937](http://127.0.0.1:7937)
-
-
 
 ### 3. 常用命令
 
 ```bash
 # 查看服务状态
-mymom status
+mymem status
 
 # 停止服务
-mymom stop
+mymem stop
 ```
 
 ---
 
 ## AI 编辑器集成
 
-Mymom 支持通过 Skills 方式集成到 AI 编辑器中，让 AI 助手能够直接调用知识库功能。
+Mymem 支持通过 Skills 方式集成到 AI 编辑器中，让 AI 助手能够直接调用知识库功能。
 
 ### Claude Code 集成
 
-将 `skills/myMom` 目录复制到 Claude Code 的根目录下的 `skills` 文件夹中：
+将 `skills/myMem` 目录复制到 Claude Code 的根目录下的 `skills` 文件夹中：
 
 ```bash
 # 假设 Claude Code 项目根目录为 /path/to/your/project
-cp -r skills/myMom /path/to/your/project/.claude/skills/myMom
+cp -r skills/myMem /path/to/your/project/.claude/skills/myMem
 ```
 
 复制完成后，Claude Code 会自动识别该技能。
@@ -107,14 +108,16 @@ cp -r skills/myMom /path/to/your/project/.claude/skills/myMom
 
 ### Cursor 集成
 
-如果您想在 Cursor 中使用 Mymom 的知识库功能，可以借助 **OpenSkills** 工具。
+如果您想在 Cursor 中使用 Mymem 的知识库功能，可以借助 **OpenSkills** 工具。
 
 **安装 OpenSkills**：
+
 ```bash
 npm i -g openskills
 ```
 
 **使用步骤**：
+
 1. 在项目根目录执行 `openskills sync` 同步技能到 `AGENTS.md`
 2. Cursor 会自动读取 `AGENTS.md` 中的技能列表
 3. 当需要调用知识库时，Cursor 会通过 `openskills read query-knowledge-base` 加载技能
@@ -138,9 +141,9 @@ npm i -g openskills
 1. **首次运行**：会自动创建数据目录并下载 Embedding 模型（约 100MB），请保持网络畅通。
 2. **数据安全**：所有数据均存储在本地，不会上传到云端。
 3. **环境识别**：
-   - 开发环境：数据存储在 `./data/`
-   - 用户环境：数据存储在 `~/.mymom/data/`
-4. **端口占用**：默认端口 7937，可通过环境变量 `MYMOM_PORT` 自定义。
+  - 开发环境：数据存储在 `./data/`
+  - 用户环境：数据存储在 `~/.mymem/data/`
+4. **端口占用**：默认端口 7937，可通过环境变量 `MYMEM_PORT` 自定义。
 
 ## 许可证
 

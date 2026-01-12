@@ -79,27 +79,27 @@ python3 scripts/build_package.py
 
 ```bash
 # 从 wheel 文件安装（推荐）
-pip install dist/mymom-0.1.0-py3-none-any.whl
+pip install dist/mymem-0.1.0-py3-none-any.whl
 
 # 或从源码安装
-pip install dist/mymom-0.1.0.tar.gz
+pip install dist/mymem-0.1.0.tar.gz
 ```
 
 ### 3. 检查安装状态
 
-在启动服务前，可以先检查 mymom 是否已正确安装：
+在启动服务前，可以先检查 mymem 是否已正确安装：
 
 ```bash
 # 方法一：查看帮助信息（如果已安装会显示帮助）
-mymom --help
+mymem --help
 # 或直接运行
-mymom
+mymem
 
 # 方法二：查看命令路径（Linux/Mac）
-which mymom
+which mymem
 
 # 方法三：查看包详细信息（包括版本、安装位置等）
-pip show mymom
+pip show mymem
 ```
 
 如果命令不存在或提示找不到，请先执行安装步骤（见上方"安装包"部分）。
@@ -108,19 +108,19 @@ pip show mymom
 
 ```bash
 # 前台启动（自动检测为生产模式）
-mymom start
+mymem start
 
 # 后台启动
-mymom start --bg
+mymem start --bg
 
 # 检查服务状态
-mymom status
+mymem status
 
 # 停止服务
-mymom stop
+mymem stop
 ```
 
-> **说明**：`mymom start` 会自动检测环境。在生产环境（无 `.git` 目录）下，会以生产模式启动（无代码热重载）。
+> **说明**：`mymem start` 会自动检测环境。在生产环境（无 `.git` 目录）下，会以生产模式启动（无代码热重载）。
 
 ### 5. 访问应用
 
@@ -130,7 +130,7 @@ mymom stop
 ### 6. 卸载
 
 ```bash
-pip uninstall mymom
+pip uninstall mymem
 ```
 
 ---
@@ -167,7 +167,7 @@ python3 scripts/publish_test.py
 该脚本会自动执行构建、检查、并上传到 TestPyPI。发布后可以通过以下命令测试安装：
 
 ```bash
-pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ mymom
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ mymem
 ```
 
 ### 3. 发布到正式 PyPI
@@ -190,13 +190,13 @@ python3 scripts/publish.py
 
 ### 环境变量
 
-可通过环境变量配置（前缀 `MYMOM_`）：
+可通过环境变量配置（前缀 `MYMEM_`）：
 
-- `MYMOM_PORT`: 服务端口（默认：7937）
-- `MYMOM_HOST`: 服务主机（默认：127.0.0.1）
-- `MYMOM_DATA_PATH`: 数据存储路径（覆盖自动选择）
-- `MYMOM_EMBEDDING_MODEL`: Embedding 模型（默认：BAAI/bge-small-zh-v1.5）
-- `MYMOM_ENV`: 环境模式（dev/prod/auto，默认：auto）
+- `MYMEM_PORT`: 服务端口（默认：7937）
+- `MYMEM_HOST`: 服务主机（默认：127.0.0.1）
+- `MYMEM_DATA_PATH`: 数据存储路径（覆盖自动选择）
+- `MYMEM_EMBEDDING_MODEL`: Embedding 模型（默认：BAAI/bge-small-zh-v1.5）
+- `MYMEM_ENV`: 环境模式（dev/prod/auto，默认：auto）
 
 ### 数据存储位置
 
@@ -205,10 +205,10 @@ python3 scripts/publish.py
 - **开发环境**（项目目录存在 `.git`）：`./data/`
   - SQLite 数据库：`./data/memories.db`
   - ChromaDB 数据：`./data/chroma/`
-- **用户环境**：`~/.mymom/data/`
-  - SQLite 数据库：`~/.mymom/data/memories.db`
-  - ChromaDB 数据：`~/.mymom/data/chroma/`
-- **自定义位置**：通过环境变量 `MYMOM_DATA_PATH` 指定
+- **用户环境**：`~/.mymem/data/`
+  - SQLite 数据库：`~/.mymem/data/memories.db`
+  - ChromaDB 数据：`~/.mymem/data/chroma/`
+- **自定义位置**：通过环境变量 `MYMEM_DATA_PATH` 指定
 
 ---
 
@@ -216,7 +216,7 @@ python3 scripts/publish.py
 
 1. **首次运行**：首次启动时会自动创建数据目录和数据库文件
 2. **模型下载**：首次使用向量搜索时会自动下载 embedding 模型（约 100MB），请确保网络连接正常
-3. **端口占用**：默认端口是 7937，如果被占用可以通过环境变量 `MYMOM_PORT` 修改
+3. **端口占用**：默认端口是 7937，如果被占用可以通过环境变量 `MYMEM_PORT` 修改
 4. **数据安全**：所有数据存储在本地，不会上传到云端
 5. **前端构建**：前端构建产物会自动集成到 `backend/static/`，支持单端口访问
 
@@ -224,7 +224,7 @@ python3 scripts/publish.py
 
 ## 故障排查
 
-### 问题：找不到 mymom 命令
+### 问题：找不到 mymem 命令
 
 **解决方案**：
 - 确保 pip 安装目录在 PATH 中
@@ -239,5 +239,5 @@ python3 scripts/publish.py
 ### 问题：端口被占用
 
 **解决方案**：
-- 使用 `MYMOM_PORT` 环境变量指定其他端口
-- 或通过 `mymom status` 检查是否有旧进程在运行
+- 使用 `MYMEM_PORT` 环境变量指定其他端口
+- 或通过 `mymem status` 检查是否有旧进程在运行

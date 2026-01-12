@@ -23,13 +23,13 @@ def is_port_open(host, port):
 
 def start_service_daemon():
     """以后台守护进程方式启动服务"""
-    print("🚀 正在启动 Mymom 服务...")
+    print("🚀 正在启动 Mymem 服务...")
 
     # 切换到后端目录以确保路径正确
     os.chdir(BACKEND_DIR)
 
     # 使用 nohup 或类似方式在后台运行，并将输出重定向
-    log_file = PROJECT_ROOT / "mymom_service.log"
+    log_file = PROJECT_ROOT / "mymem_service.log"
 
     # 判定操作系统
     if os.name == 'nt':  # Windows
@@ -55,11 +55,11 @@ def start_service_daemon():
 
 def main():
     # 默认配置，后续可从环境变量读取
-    host = os.getenv("MYMOM_HOST", "127.0.0.1")
-    port = int(os.getenv("MYMOM_PORT", 7937))
+    host = os.getenv("MYMEM_HOST", "127.0.0.1")
+    port = int(os.getenv("MYMEM_PORT", 7937))
 
     if is_port_open(host, port):
-        print(f"✨ Mymom 服务已在 {host}:{port} 运行。")
+        print(f"✨ Mymem 服务已在 {host}:{port} 运行。")
         sys.exit(0)
 
     start_service_daemon()

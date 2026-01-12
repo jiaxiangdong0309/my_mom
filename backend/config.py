@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     project_root: Path = Path(base_dir).parent
 
     # 环境设置 (dev, prod, auto)
-    # 支持通过环境变量 MYMOM_ENV 覆盖
+    # 支持通过环境变量 MYMEM_ENV 覆盖
     env: str = "auto"
 
     @property
@@ -29,11 +29,11 @@ class Settings(BaseSettings):
         return (self.project_root / ".git").exists()
 
     # 智能路径管理
-    # 1. 优先使用环境变量 MYMOM_DATA_PATH
+    # 1. 优先使用环境变量 MYMEM_DATA_PATH
     # 2. 如果是开发环境，使用项目根目录下的 ./data
-    # 3. 否则认为是用户环境，使用 ~/.mymom/data
+    # 3. 否则认为是用户环境，使用 ~/.mymem/data
     def _get_default_data_dir(self) -> str:
-        env_path = os.getenv("MYMOM_DATA_PATH")
+        env_path = os.getenv("MYMEM_DATA_PATH")
         if env_path:
             return os.path.abspath(env_path)
 
@@ -42,7 +42,7 @@ class Settings(BaseSettings):
             return str(self.project_root / "data")
 
         # 用户环境，存放在家目录
-        user_home_data = Path.home() / ".mymom" / "data"
+        user_home_data = Path.home() / ".mymem" / "data"
         return str(user_home_data)
 
     @property
@@ -69,7 +69,7 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
 
     class Config:
-        env_prefix = "MYMOM_"
+        env_prefix = "MYMEM_"
         env_file = ".env"
         extra = "ignore"  # 忽略未定义的字段（如 PYPI_TOKEN、TEST_PYPI_TOKEN 等）
 

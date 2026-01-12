@@ -18,12 +18,12 @@ PROJECT_ROOT = Path(__file__).parent.parent
 
 # 常量定义
 SEPARATOR = "=" * 60
-PACKAGE_NAME = "mymom"
+PACKAGE_NAME = "mymem"
 TESTPYPI_INSTALL_CMD = (
     "pip install --index-url https://test.pypi.org/simple/ "
-    "--extra-index-url https://pypi.org/simple/ mymom"
+    "--extra-index-url https://pypi.org/simple/ mymem"
 )
-PYPI_PROJECT_URL = "https://pypi.org/project/mymom/"
+PYPI_PROJECT_URL = "https://pypi.org/project/mymem/"
 
 
 def load_env_file():
@@ -57,7 +57,7 @@ def run_command(cmd, check=True, env=None):
 
 def main():
     """主函数"""
-    parser = argparse.ArgumentParser(description="发布 mymom 到 PyPI")
+    parser = argparse.ArgumentParser(description="发布 mymem 到 PyPI")
     parser.add_argument(
         "--test",
         action="store_true",

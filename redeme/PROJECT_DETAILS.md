@@ -26,7 +26,7 @@
 ## 项目结构
 
 ```
-Mymom/
+Mymem/
 ├── backend/                    # 后端服务
 │   ├── main.py                 # FastAPI 入口
 │   ├── config.py               # 配置管理
@@ -101,10 +101,10 @@ Mymom/
 - ✅ 智能路径选择（开发/用户环境自动识别）
 
 ### 4. CLI 工具
-- ✅ `mymom start` - 前台启动服务
-- ✅ `mymom start --bg` - 后台启动服务
-- ✅ `mymom status` - 检查服务状态
-- ✅ `mymom stop` - 停止服务
+- ✅ `mymem start` - 前台启动服务
+- ✅ `mymem start --bg` - 后台启动服务
+- ✅ `mymem status` - 检查服务状态
+- ✅ `mymem stop` - 停止服务
 
 ## API 接口
 
@@ -127,16 +127,16 @@ Mymom/
 ### 数据存储位置
 数据存储位置根据运行环境自动选择：
 - **开发环境**（项目目录存在 `.git`）：`./data/`
-- **用户环境**：`~/.mymom/data/`
-- **自定义位置**：通过环境变量 `MYMOM_DATA_PATH` 指定
+- **用户环境**：`~/.mymem/data/`
+- **自定义位置**：通过环境变量 `MYMEM_DATA_PATH` 指定
 
 ### 配置说明
-可通过环境变量配置（前缀 `MYMOM_`）：
-- `MYMOM_PORT`: 服务端口（默认：7937）
-- `MYMOM_HOST`: 服务主机（默认：127.0.0.1）
-- `MYMOM_DATA_PATH`: 数据存储路径
-- `MYMOM_EMBEDDING_MODEL`: Embedding 模型
-- `MYMOM_ENV`: 环境模式 (dev/prod/auto)
+可通过环境变量配置（前缀 `MYMEM_`）：
+- `MYMEM_PORT`: 服务端口（默认：7937）
+- `MYMEM_HOST`: 服务主机（默认：127.0.0.1）
+- `MYMEM_DATA_PATH`: 数据存储路径
+- `MYMEM_EMBEDDING_MODEL`: Embedding 模型
+- `MYMEM_ENV`: 环境模式 (dev/prod/auto)
 
 ## 开发状态
 当前版本：**v0.1.1**

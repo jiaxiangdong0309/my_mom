@@ -22,7 +22,7 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 # TestPyPI 命令模板
 TESTPYPI_INDEX_URL = "https://test.pypi.org/simple/"
 PYPI_INDEX_URL = "https://pypi.org/simple/"
-PACKAGE_NAME = "mymom"
+PACKAGE_NAME = "mymem"
 
 TESTPYPI_INSTALL_CMD = (
     f"pip install --index-url {TESTPYPI_INDEX_URL} "
@@ -96,7 +96,7 @@ def print_usage_commands():
 def main():
     """测试发布到 TestPyPI"""
     parser = argparse.ArgumentParser(
-        description="测试发布 mymom 到 TestPyPI",
+        description="测试发布 mymem 到 TestPyPI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:

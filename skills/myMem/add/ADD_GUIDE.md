@@ -46,7 +46,7 @@ python3 .claude/skills/query-knowledge-base/add/add_db.py \
 
 *   **成功场景**: 必须且仅返回：`已经存储成功`
 *   **失败场景**:
-    *   **连接失败**: 若提示 `无法连接到 API 服务器`，必须立即停止任务，仅回复：`请运行 mymom start 开启服务，开启后向我发送 done 指令，我将继续完成操作`。
+    *   **连接失败**: 若提示 `无法连接到 API 服务器`，必须立即停止任务，仅回复：`请运行 mymem start 开启服务，开启后向我发送 done 指令，我将继续完成操作`。
     *   **其他原因**: 必须且仅返回：`存储失败 原因：[具体错误描述]`
 
 **NEVER**: 严禁在成功后输出 ID、路径、存储内容摘要或任何“已为您保存好”之类的客套话。严禁在失败后尝试分析失败原因或建议手动保存方案。
@@ -62,7 +62,7 @@ python3 .claude/skills/query-knowledge-base/add/add_db.py \
 
 | 错误表现 | 根本原因 | 强制对策 |
 | :--- | :--- | :--- |
-| `Connection failed` | 后端 `mymom` 未启动 | **MANDATORY**: 停止任务，要求用户运行 `mymom start` 并等待 `done` 指令。 |
+| `Connection failed` | 后端 `mymem` 未启动 | **MANDATORY**: 停止任务，要求用户运行 `mymem start` 并等待 `done` 指令。 |
 | 变量 `$host` 丢失 | Heredoc 未使用 `'EOF'` | **CRITICAL**: 检查 `cat <<'EOF'` 是否包含单引号。 |
 | `Permission denied` | 脚本权限问题 | 尝试 `python3 path/to/script.py` 而非直接运行。 |
 

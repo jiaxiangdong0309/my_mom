@@ -83,7 +83,7 @@ def main():
         print("✨ 打包完成！")
         print("="*60)
         print("\n安装方式:")
-        print("  pip install dist/mymom-0.1.0-py3-none-any.whl")
+        print("  pip install dist/mymem-0.1.0-py3-none-any.whl")
         print("\n或查看 INSTALL.md 了解更多信息。")
 
     except KeyboardInterrupt:

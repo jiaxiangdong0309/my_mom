@@ -15,7 +15,7 @@ if sys.version_info[0] < 3:
 try:
     import requests
 except ImportError:
-    sys.stderr.write("错误: 需要安装 mymom 环境或单独安装 requests 库\n")
+    sys.stderr.write("错误: 需要安装 mymem 环境或单独安装 requests 库\n")
     sys.stderr.write("请运行: pip install requests 或安装主程序\n")
     sys.exit(1)
 
@@ -54,7 +54,7 @@ def add_memory(api_url, title, content, tags=None):
 
         return memory_id
     except requests.exceptions.ConnectionError:
-        raise ConnectionError(f"无法连接到 API 服务器: {api_url}\n请确保 Mymom 服务已启动（运行命令: mymom start）")
+        raise ConnectionError(f"无法连接到 API 服务器: {api_url}\n请确保 Mymem 服务已启动（运行命令: mymem start）")
     except requests.exceptions.HTTPError as e:
         error_detail = ""
         try:

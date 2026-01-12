@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mymom"
+name = "mymem"
 version = "0.1.2"
 description = "AI 知识记忆库 - 本地 RAG 工具"
 readme = "README.md"
@@ -47,13 +47,13 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 [project.urls]
-Homepage = "https://github.com/xiangdongjia/mymom"
-Documentation = "https://github.com/xiangdongjia/mymom#readme"
-Repository = "https://github.com/xiangdongjia/mymom"
-Issues = "https://github.com/xiangdongjia/mymom/issues"
+Homepage = "https://github.com/xiangdongjia/mymem"
+Documentation = "https://github.com/xiangdongjia/mymem#readme"
+Repository = "https://github.com/xiangdongjia/mymem"
+Issues = "https://github.com/xiangdongjia/mymem/issues"
 
 [project.scripts]
-mymom = "backend.main:cli"
+mymem = "backend.main:cli"
 
 [tool.setuptools.packages.find]
 where = ["."]

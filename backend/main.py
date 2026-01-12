@@ -73,7 +73,7 @@ if os.path.exists(static_dir):
 else:
     @app.get("/")
     async def root_fallback():
-        return {"message": "Mymom API is running. Frontend not built yet."}
+        return {"message": "Mymem API is running. Frontend not built yet."}
 
 def run_server():
     import uvicorn
@@ -93,7 +93,7 @@ def cli():
     import subprocess
     import time
 
-    parser = argparse.ArgumentParser(description="Mymom - AI 知识记忆库 CLI 工具")
+    parser = argparse.ArgumentParser(description="Mymem - AI 知识记忆库 CLI 工具")
     subparsers = parser.add_subparsers(dest="command", help="命令")
 
     # start 命令
@@ -159,14 +159,14 @@ def cli():
 
     if args.command == "status":
         if is_port_open(settings.host, settings.port):
-            print(f"✅ Mymom 服务正在运行: http://{settings.host}:{settings.port}")
+            print(f"✅ Mymem 服务正在运行: http://{settings.host}:{settings.port}")
         else:
-            print(f"❌ Mymom 服务未运行")
+            print(f"❌ Mymem 服务未运行")
         sys.exit(0)
 
     elif args.command == "stop":
         if not is_port_open(settings.host, settings.port):
-            print(f"❌ Mymom 服务未运行")
+            print(f"❌ Mymem 服务未运行")
             sys.exit(0)
 
         if stop_service():
@@ -182,13 +182,13 @@ def cli():
 
     elif args.command == "start" or args.command is None:
         if is_port_open(settings.host, settings.port):
-            print(f"✨ Mymom 服务已在 http://{settings.host}:{settings.port} 运行。")
+            print(f"✨ Mymem 服务已在 http://{settings.host}:{settings.port} 运行。")
             sys.exit(0)
 
         if getattr(args, 'bg', False):
             # 后台启动模式
-            print("🚀 正在后台启动 Mymom 服务...")
-            log_file = os.path.join(os.path.expanduser("~"), "mymom_service.log")
+            print("🚀 正在后台启动 Mymem 服务...")
+            log_file = os.path.join(os.path.expanduser("~"), "mymem_service.log")
 
             # 使用 uvicorn 直接启动，更可靠
             import uvicorn
@@ -231,10 +231,10 @@ def cli():
                     print(f"✅ 服务启动成功: http://{settings.host}:{settings.port}")
                     print(f"📝 日志文件: {log_file}")
                     sys.exit(0)
-            print(f"⏳ 服务正在启动中，请稍后通过 `mymom status` 检查。")
+            print(f"⏳ 服务正在启动中，请稍后通过 `mymem status` 检查。")
             print(f"📝 日志文件: {log_file}")
         else:
-            print(f"🚀 正在启动 Mymom 服务 (端口: {settings.port})...")
+            print(f"🚀 正在启动 Mymem 服务 (端口: {settings.port})...")
             run_server()
     else:
         parser.print_help()
